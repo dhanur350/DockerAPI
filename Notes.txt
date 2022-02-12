@@ -1,0 +1,56 @@
+# Get base SDK Image from Microsoft
+FROM mcr.microsoft.com/dotnet/core/sdk:5.0 AS built-env
+WORKDIR /app
+
+#Copy csproj file and restore any dependencies (via NUGET) 
+COPY *.csproj ./
+RUN dotnet restore
+
+#Copy the project file and build our releases
+COPY . ./
+RUN dotnet publish -c Release -o out
+
+#Generate Runtine image
+FROM mcr.microsoft.com/dotnet/core/sdk:5.0
+WORKDIR /app
+EXPOSE 80
+COPY --from=build-env /app/out .
+ENTRYPOINT ["dotnet","DockerAPI.dll"]
+
+To remove all Docker Images in System for linux command is:->
+sudo docker rmi -f $(sudo docker images -aq)
+
+To use docker without Sudo use :->
+sudo usermod -aG docker ${USER}
+Then Restart
+
+Login on Docker in Linux by :->
+docker login
+
+When we wrote instructions in Dockerfile then to build that in Docker image use this:->
+sudo docker build -t dhanurdock/dockerapi .
+You should see this thing after entering the command in terminal
+Successfully built 9429d189235c
+Successfully tagged dhanurdock/dockerapi:latest
+
+It means the Dockerfile successfully built the images for this
+
+Now it's turn to run it use this command :->
+sudo docker run -p 8080:80 dhanurdock/dockerapi
+
+Finally finally push this in your Dockerhub
+docker push dhanurdock/dockerapi
+You'll see this message in Terminal 
+61fac60e7652: Pushed 
+e8c9b1812c81: Pushed 
+c3e6dffd15cc: Pushed 
+a8576e875051: Pushed 
+b6414f5516ef: Pushed 
+ac7127334263: Pushed 
+f403f6573e99: Pushed 
+8d650ca022e2: Pushed 
+068c0c45d9f4: Pushed 
+f18b02b14138: Pushed 
+latest: digest: sha256:267b71e7cbd179037232cde68aff581e5de5c0e98b7a6275353204ed88013e84 size: 2426
+
+It means you successfully pushed into your docker
